@@ -43,7 +43,8 @@ func clampUint16(in int64) uint16 {
 	return 0
 }
 
-func resizeGeneric(in image.Image, out *image.RGBA64, scale float64, coeffs []int32, offset []int, filterLength int) {
+// func resizeGeneric(in image.Image, out *image.RGBA64, scale float64, coeffs []int32, offset []int, filterLength int) {
+func resizeGeneric(in image.Image, out *image.RGBA64, _ float64, coeffs []int32, offset []int, filterLength int) {
 	newBounds := out.Bounds()
 	maxX := in.Bounds().Dx() - 1
 
@@ -53,7 +54,7 @@ func resizeGeneric(in image.Image, out *image.RGBA64, scale float64, coeffs []in
 			var sum int64
 			start := offset[y]
 			ci := y * filterLength
-			for i := 0; i < filterLength; i++ {
+			for i := range filterLength {
 				coeff := coeffs[ci+i]
 				if coeff != 0 {
 					xi := start + i
@@ -92,7 +93,8 @@ func resizeGeneric(in image.Image, out *image.RGBA64, scale float64, coeffs []in
 	}
 }
 
-func resizeRGBA(in *image.RGBA, out *image.RGBA, scale float64, coeffs []int16, offset []int, filterLength int) {
+// func resizeRGBA(in *image.RGBA, out *image.RGBA, scale float64, coeffs []int16, offset []int, filterLength int) {
+func resizeRGBA(in *image.RGBA, out *image.RGBA, _ float64, coeffs []int16, offset []int, filterLength int) {
 	newBounds := out.Bounds()
 	maxX := in.Bounds().Dx() - 1
 
@@ -103,7 +105,7 @@ func resizeRGBA(in *image.RGBA, out *image.RGBA, scale float64, coeffs []int16, 
 			var sum int32
 			start := offset[y]
 			ci := y * filterLength
-			for i := 0; i < filterLength; i++ {
+			for i := range filterLength {
 				coeff := coeffs[ci+i]
 				if coeff != 0 {
 					xi := start + i
@@ -134,7 +136,8 @@ func resizeRGBA(in *image.RGBA, out *image.RGBA, scale float64, coeffs []int16, 
 	}
 }
 
-func resizeNRGBA(in *image.NRGBA, out *image.RGBA, scale float64, coeffs []int16, offset []int, filterLength int) {
+// func resizeNRGBA(in *image.NRGBA, out *image.RGBA, scale float64, coeffs []int16, offset []int, filterLength int) {
+func resizeNRGBA(in *image.NRGBA, out *image.RGBA, _ float64, coeffs []int16, offset []int, filterLength int) {
 	newBounds := out.Bounds()
 	maxX := in.Bounds().Dx() - 1
 
@@ -145,7 +148,7 @@ func resizeNRGBA(in *image.NRGBA, out *image.RGBA, scale float64, coeffs []int16
 			var sum int32
 			start := offset[y]
 			ci := y * filterLength
-			for i := 0; i < filterLength; i++ {
+			for i := range filterLength {
 				coeff := coeffs[ci+i]
 				if coeff != 0 {
 					xi := start + i
@@ -185,7 +188,8 @@ func resizeNRGBA(in *image.NRGBA, out *image.RGBA, scale float64, coeffs []int16
 	}
 }
 
-func resizeRGBA64(in *image.RGBA64, out *image.RGBA64, scale float64, coeffs []int32, offset []int, filterLength int) {
+// func resizeRGBA64(in *image.RGBA64, out *image.RGBA64, scale float64, coeffs []int32, offset []int, filterLength int) {
+func resizeRGBA64(in *image.RGBA64, out *image.RGBA64, _ float64, coeffs []int32, offset []int, filterLength int) {
 	newBounds := out.Bounds()
 	maxX := in.Bounds().Dx() - 1
 
@@ -196,7 +200,7 @@ func resizeRGBA64(in *image.RGBA64, out *image.RGBA64, scale float64, coeffs []i
 			var sum int64
 			start := offset[y]
 			ci := y * filterLength
-			for i := 0; i < filterLength; i++ {
+			for i := range filterLength {
 				coeff := coeffs[ci+i]
 				if coeff != 0 {
 					xi := start + i
@@ -235,7 +239,8 @@ func resizeRGBA64(in *image.RGBA64, out *image.RGBA64, scale float64, coeffs []i
 	}
 }
 
-func resizeNRGBA64(in *image.NRGBA64, out *image.RGBA64, scale float64, coeffs []int32, offset []int, filterLength int) {
+// func resizeNRGBA64(in *image.NRGBA64, out *image.RGBA64, scale float64, coeffs []int32, offset []int, filterLength int) {
+func resizeNRGBA64(in *image.NRGBA64, out *image.RGBA64, _ float64, coeffs []int32, offset []int, filterLength int) {
 	newBounds := out.Bounds()
 	maxX := in.Bounds().Dx() - 1
 
@@ -246,7 +251,7 @@ func resizeNRGBA64(in *image.NRGBA64, out *image.RGBA64, scale float64, coeffs [
 			var sum int64
 			start := offset[y]
 			ci := y * filterLength
-			for i := 0; i < filterLength; i++ {
+			for i := range filterLength {
 				coeff := coeffs[ci+i]
 				if coeff != 0 {
 					xi := start + i
@@ -294,7 +299,8 @@ func resizeNRGBA64(in *image.NRGBA64, out *image.RGBA64, scale float64, coeffs [
 	}
 }
 
-func resizeGray(in *image.Gray, out *image.Gray, scale float64, coeffs []int16, offset []int, filterLength int) {
+// func resizeGray(in *image.Gray, out *image.Gray, scale float64, coeffs []int16, offset []int, filterLength int) {
+func resizeGray(in *image.Gray, out *image.Gray, _ float64, coeffs []int16, offset []int, filterLength int) {
 	newBounds := out.Bounds()
 	maxX := in.Bounds().Dx() - 1
 
@@ -305,7 +311,7 @@ func resizeGray(in *image.Gray, out *image.Gray, scale float64, coeffs []int16, 
 			var sum int32
 			start := offset[y]
 			ci := y * filterLength
-			for i := 0; i < filterLength; i++ {
+			for i := range filterLength {
 				coeff := coeffs[ci+i]
 				if coeff != 0 {
 					xi := start + i
@@ -326,7 +332,8 @@ func resizeGray(in *image.Gray, out *image.Gray, scale float64, coeffs []int16, 
 	}
 }
 
-func resizeGray16(in *image.Gray16, out *image.Gray16, scale float64, coeffs []int32, offset []int, filterLength int) {
+// func resizeGray16(in *image.Gray16, out *image.Gray16, scale float64, coeffs []int32, offset []int, filterLength int) {
+func resizeGray16(in *image.Gray16, out *image.Gray16, _ float64, coeffs []int32, offset []int, filterLength int) {
 	newBounds := out.Bounds()
 	maxX := in.Bounds().Dx() - 1
 
@@ -337,7 +344,7 @@ func resizeGray16(in *image.Gray16, out *image.Gray16, scale float64, coeffs []i
 			var sum int64
 			start := offset[y]
 			ci := y * filterLength
-			for i := 0; i < filterLength; i++ {
+			for i := range filterLength {
 				coeff := coeffs[ci+i]
 				if coeff != 0 {
 					xi := start + i
@@ -362,7 +369,8 @@ func resizeGray16(in *image.Gray16, out *image.Gray16, scale float64, coeffs []i
 	}
 }
 
-func resizeYCbCr(in *ycc, out *ycc, scale float64, coeffs []int16, offset []int, filterLength int) {
+// func resizeYCbCr(in *ycc, out *ycc, scale float64, coeffs []int16, offset []int, filterLength int) {
+func resizeYCbCr(in *ycc, out *ycc, _ float64, coeffs []int16, offset []int, filterLength int) {
 	newBounds := out.Bounds()
 	maxX := in.Bounds().Dx() - 1
 
@@ -373,7 +381,7 @@ func resizeYCbCr(in *ycc, out *ycc, scale float64, coeffs []int16, offset []int,
 			var sum int32
 			start := offset[y]
 			ci := y * filterLength
-			for i := 0; i < filterLength; i++ {
+			for i := range filterLength {
 				coeff := coeffs[ci+i]
 				if coeff != 0 {
 					xi := start + i
@@ -400,7 +408,8 @@ func resizeYCbCr(in *ycc, out *ycc, scale float64, coeffs []int16, offset []int,
 	}
 }
 
-func nearestYCbCr(in *ycc, out *ycc, scale float64, coeffs []bool, offset []int, filterLength int) {
+// func nearestYCbCr(in *ycc, out *ycc, scale float64, coeffs []bool, offset []int, filterLength int) {
+func nearestYCbCr(in *ycc, out *ycc, _ float64, coeffs []bool, offset []int, filterLength int) {
 	newBounds := out.Bounds()
 	maxX := in.Bounds().Dx() - 1
 
@@ -411,7 +420,7 @@ func nearestYCbCr(in *ycc, out *ycc, scale float64, coeffs []bool, offset []int,
 			var sum float32
 			start := offset[y]
 			ci := y * filterLength
-			for i := 0; i < filterLength; i++ {
+			for i := range filterLength {
 				if coeffs[ci+i] {
 					xi := start + i
 					switch {
