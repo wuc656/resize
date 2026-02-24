@@ -37,18 +37,12 @@ func Thumbnail(maxWidth, maxHeight uint, img image.Image, interp InterpolationFu
 
 	// Preserve aspect ratio
 	if origWidth > maxWidth {
-		newHeight = uint(origHeight * maxWidth / origWidth)
-		if newHeight < 1 {
-			newHeight = 1
-		}
+		newHeight = max(uint(origHeight * maxWidth / origWidth), 1)
 		newWidth = maxWidth
 	}
 
 	if newHeight > maxHeight {
-		newWidth = uint(newWidth * maxHeight / newHeight)
-		if newWidth < 1 {
-			newWidth = 1
-		}
+		newWidth = max(uint(newWidth * maxHeight / newHeight), 1)
 		newHeight = maxHeight
 	}
 	return Resize(newWidth, newHeight, img, interp)
