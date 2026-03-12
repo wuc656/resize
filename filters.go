@@ -86,7 +86,7 @@ func createWeights8(dy, filterLength int, blur, scale float64, kernel func(float
 
 	coeffs := make([]int16, dy*filterLength)
 	start := make([]int, dy)
-	for y := 0; y < dy; y++ {
+	for y := range dy {
 		interpX := scale*(float64(y)+0.5) - 0.5
 		start[y] = int(interpX) - filterLength/2 + 1
 		interpX -= float64(start[y])
@@ -106,7 +106,7 @@ func createWeights16(dy, filterLength int, blur, scale float64, kernel func(floa
 
 	coeffs := make([]int32, dy*filterLength)
 	start := make([]int, dy)
-	for y := 0; y < dy; y++ {
+	for y := range dy {
 		interpX := scale*(float64(y)+0.5) - 0.5
 		start[y] = int(interpX) - filterLength/2 + 1
 		interpX -= float64(start[y])
@@ -125,7 +125,7 @@ func createWeightsNearest(dy, filterLength int, blur, scale float64) ([]bool, []
 
 	coeffs := make([]bool, dy*filterLength)
 	start := make([]int, dy)
-	for y := 0; y < dy; y++ {
+	for y := range dy {
 		interpX := scale*(float64(y)+0.5) - 0.5
 		start[y] = int(interpX) - filterLength/2 + 1
 		interpX -= float64(start[y])
