@@ -20,6 +20,24 @@ import (
 	"math"
 )
 
+// Filter kernel coefficients and thresholds
+const (
+	// Mitchell-Netravali filter constants (B=1/3, C=1/3)
+	// First region (|x| <= 1)
+	mitchellCoeff1 = 7.0
+	mitchellCoeff2 = 12.0
+	mitchellCoeff3 = 5.33333333333 // (16/3)
+	mitchellScale  = 1.0 / 6.0
+
+	// Second region (1 < |x| <= 2)
+	mitchellCoeff2b = 2.33333333333 // (7/3)
+	mitchellCoeff7  = 20.0
+	mitchellCoeff8  = 10.6666666667 // (32/3)
+
+	// Sinc function threshold for avoiding division by near-zero
+	sincThreshold = 1.220703e-4
+)
+
 func nearest(in float64) float64 {
 	if in >= -0.5 && in < 0.5 {
 		return 1
@@ -49,32 +67,42 @@ func cubic(in float64) float64 {
 func mitchellnetravali(in float64) float64 {
 	in = math.Abs(in)
 	if in <= 1 {
-		return (7.0*in*in*in - 12.0*in*in + 5.33333333333) * 0.16666666666
+		return (mitchellCoeff1*in*in*in - mitchellCoeff2*in*in + mitchellCoeff3) * mitchellScale
 	}
 	if in <= 2 {
-		return (-2.33333333333*in*in*in + 12.0*in*in - 20.0*in + 10.6666666667) * 0.16666666666
+		return (-mitchellCoeff2b*in*in*in + mitchellCoeff2*in*in - mitchellCoeff7*in + mitchellCoeff8) * mitchellScale
 	}
 	return 0
 }
 
 func sinc(x float64) float64 {
 	x = math.Abs(x) * math.Pi
-	if x >= 1.220703e-4 {
+	if x >= sincThreshold {
 		return math.Sin(x) / x
 	}
 	return 1
 }
 
+// Weights calculation scale factors
+const (
+	weightScale8  = 256   // scaling factor for 8-bit coefficients
+	weightScale16 = 65536 // scaling factor for 16-bit coefficients
+
+	// Lanczos2 and Lanczos3 constants
+	lanczos2Ratio = 0.5       // a = 2
+	lanczos3Ratio = 1.0 / 3.0 // a = 3
+)
+
 func lanczos2(in float64) float64 {
 	if in > -2 && in < 2 {
-		return sinc(in) * sinc(in*0.5)
+		return sinc(in) * sinc(in*lanczos2Ratio)
 	}
 	return 0
 }
 
 func lanczos3(in float64) float64 {
 	if in > -3 && in < 3 {
-		return sinc(in) * sinc(in*0.3333333333333333)
+		return sinc(in) * sinc(in*lanczos3Ratio)
 	}
 	return 0
 }
@@ -92,7 +120,7 @@ func createWeights8(dy, filterLength int, blur, scale float64, kernel func(float
 		interpX -= float64(start[y])
 		for i := range filterLength {
 			in := (interpX - float64(i)) * filterFactor
-			coeffs[y*filterLength+i] = int16(kernel(in) * 256)
+			coeffs[y*filterLength+i] = int16(kernel(in) * weightScale8)
 		}
 	}
 
@@ -112,7 +140,7 @@ func createWeights16(dy, filterLength int, blur, scale float64, kernel func(floa
 		interpX -= float64(start[y])
 		for i := range filterLength {
 			in := (interpX - float64(i)) * filterFactor
-			coeffs[y*filterLength+i] = int32(kernel(in) * 65536)
+			coeffs[y*filterLength+i] = int32(kernel(in) * weightScale16)
 		}
 	}
 

@@ -21,15 +21,15 @@ import "image"
 func floatToUint8(x float32) uint8 {
 	// Nearest-neighbor values are always
 	// positive no need to check lower-bound.
-	if x > 0xfe {
-		return 0xff
+	if x > maxUint8-1 {
+		return maxUint8
 	}
 	return uint8(x)
 }
 
 func floatToUint16(x float32) uint16 {
-	if x > 0xfffe {
-		return 0xffff
+	if x > maxUint16-1 {
+		return maxUint16
 	}
 	return uint16(x)
 }

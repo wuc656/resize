@@ -74,6 +74,11 @@ func (i InterpolationFunction) kernel() (int, func(float64) float64) {
 // values <1 will sharpen the image
 var blur = 1.0
 
+// aspectRatioRoundingBias is used when preserving aspect ratio with 0 dimensions.
+// The value 0.7 biases rounding upward to avoid premature truncation when converting
+// the calculated float dimension to uint, ensuring proper aspect ratio preservation.
+const aspectRatioRoundingBias = 0.7
+
 // Resize scales an image to new width and height using the interpolation function interp.
 // A new image with the given dimensions will be returned.
 // If one of the parameters width or height is set to 0, its size will be calculated so that
@@ -83,10 +88,10 @@ var blur = 1.0
 func Resize(width, height uint, img image.Image, interp InterpolationFunction) image.Image {
 	scaleX, scaleY := calcFactors(width, height, float64(img.Bounds().Dx()), float64(img.Bounds().Dy()))
 	if width == 0 {
-		width = uint(0.7 + float64(img.Bounds().Dx())/scaleX)
+		width = uint(aspectRatioRoundingBias + float64(img.Bounds().Dx())/scaleX)
 	}
 	if height == 0 {
-		height = uint(0.7 + float64(img.Bounds().Dy())/scaleY)
+		height = uint(aspectRatioRoundingBias + float64(img.Bounds().Dy())/scaleY)
 	}
 
 	// Trivial case: return input image

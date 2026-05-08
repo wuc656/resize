@@ -18,27 +18,39 @@ package resize
 
 import "image"
 
+// Constants for bit depth clamping operations
+const (
+	// uint8 maximum value
+	maxUint8 = 0xFF
+	// uint8 range for overflow detection
+	uint8Range = 256
+	// uint16 maximum value
+	maxUint16 = 0xFFFF
+	// uint16 range for overflow detection
+	uint16Range = 65536
+)
+
 // Keep value in [0,255] range.
 func clampUint8(in int32) uint8 {
 	// casting a negative int to an uint will result in an overflown
 	// large uint. this behavior will be exploited here and in other functions
 	// to achieve a higher performance.
-	if uint32(in) < 256 {
+	if uint32(in) < uint8Range {
 		return uint8(in)
 	}
-	if in > 255 {
-		return 255
+	if in > maxUint8 {
+		return maxUint8
 	}
 	return 0
 }
 
 // Keep value in [0,65535] range.
 func clampUint16(in int64) uint16 {
-	if uint64(in) < 65536 {
+	if uint64(in) < uint16Range {
 		return uint16(in)
 	}
-	if in > 65535 {
-		return 65535
+	if in > maxUint16 {
+		return maxUint16
 	}
 	return 0
 }
