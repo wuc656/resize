@@ -46,7 +46,9 @@ func nearest(in float64) float64 {
 }
 
 func linear(in float64) float64 {
-	in = math.Abs(in)
+	if in < 0 {
+		in = -in
+	}
 	if in <= 1 {
 		return 1 - in
 	}
@@ -54,7 +56,9 @@ func linear(in float64) float64 {
 }
 
 func cubic(in float64) float64 {
-	in = math.Abs(in)
+	if in < 0 {
+		in = -in
+	}
 	if in <= 1 {
 		return in*in*(1.5*in-2.5) + 1.0
 	}
@@ -65,7 +69,9 @@ func cubic(in float64) float64 {
 }
 
 func mitchellnetravali(in float64) float64 {
-	in = math.Abs(in)
+	if in < 0 {
+		in = -in
+	}
 	if in <= 1 {
 		return (mitchellCoeff1*in*in*in - mitchellCoeff2*in*in + mitchellCoeff3) * mitchellScale
 	}
@@ -76,7 +82,10 @@ func mitchellnetravali(in float64) float64 {
 }
 
 func sinc(x float64) float64 {
-	x = math.Abs(x) * math.Pi
+	if x < 0 {
+		x = -x
+	}
+	x = x * math.Pi
 	if x >= sincThreshold {
 		return math.Sin(x) / x
 	}

@@ -62,7 +62,7 @@ func resizeGeneric(in image.Image, out *image.RGBA64, _ float64, coeffs []int32,
 
 	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
 		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
-			var rgba [4]int64
+			var rA, gA, bA, aA int64
 			var sum int64
 			start := offset[y]
 			ci := y * filterLength
@@ -79,26 +79,26 @@ func resizeGeneric(in image.Image, out *image.RGBA64, _ float64, coeffs []int32,
 
 					r, g, b, a := in.At(xi+in.Bounds().Min.X, x+in.Bounds().Min.Y).RGBA()
 
-					rgba[0] += int64(coeff) * int64(r)
-					rgba[1] += int64(coeff) * int64(g)
-					rgba[2] += int64(coeff) * int64(b)
-					rgba[3] += int64(coeff) * int64(a)
+					rA += int64(coeff) * int64(r)
+					gA += int64(coeff) * int64(g)
+					bA += int64(coeff) * int64(b)
+					aA += int64(coeff) * int64(a)
 					sum += int64(coeff)
 				}
 			}
 
 			offset := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*8
 
-			value := clampUint16(rgba[0] / sum)
+			value := clampUint16(rA / sum)
 			out.Pix[offset+0] = uint8(value >> 8)
 			out.Pix[offset+1] = uint8(value)
-			value = clampUint16(rgba[1] / sum)
+			value = clampUint16(gA / sum)
 			out.Pix[offset+2] = uint8(value >> 8)
 			out.Pix[offset+3] = uint8(value)
-			value = clampUint16(rgba[2] / sum)
+			value = clampUint16(bA / sum)
 			out.Pix[offset+4] = uint8(value >> 8)
 			out.Pix[offset+5] = uint8(value)
-			value = clampUint16(rgba[3] / sum)
+			value = clampUint16(aA / sum)
 			out.Pix[offset+6] = uint8(value >> 8)
 			out.Pix[offset+7] = uint8(value)
 		}
@@ -113,7 +113,7 @@ func resizeRGBA(in *image.RGBA, out *image.RGBA, _ float64, coeffs []int16, offs
 	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
 		row := in.Pix[x*in.Stride:]
 		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
-			var rgba [4]int32
+			var rA, gA, bA, aA int32
 			var sum int32
 			start := offset[y]
 			ci := y * filterLength
@@ -130,20 +130,20 @@ func resizeRGBA(in *image.RGBA, out *image.RGBA, _ float64, coeffs []int16, offs
 						xi = 0
 					}
 
-					rgba[0] += int32(coeff) * int32(row[xi+0])
-					rgba[1] += int32(coeff) * int32(row[xi+1])
-					rgba[2] += int32(coeff) * int32(row[xi+2])
-					rgba[3] += int32(coeff) * int32(row[xi+3])
+					rA += int32(coeff) * int32(row[xi+0])
+					gA += int32(coeff) * int32(row[xi+1])
+					bA += int32(coeff) * int32(row[xi+2])
+					aA += int32(coeff) * int32(row[xi+3])
 					sum += int32(coeff)
 				}
 			}
 
 			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*4
 
-			out.Pix[xo+0] = clampUint8(rgba[0] / sum)
-			out.Pix[xo+1] = clampUint8(rgba[1] / sum)
-			out.Pix[xo+2] = clampUint8(rgba[2] / sum)
-			out.Pix[xo+3] = clampUint8(rgba[3] / sum)
+			out.Pix[xo+0] = clampUint8(rA / sum)
+			out.Pix[xo+1] = clampUint8(gA / sum)
+			out.Pix[xo+2] = clampUint8(bA / sum)
+			out.Pix[xo+3] = clampUint8(aA / sum)
 		}
 	}
 }
@@ -156,7 +156,7 @@ func resizeNRGBA(in *image.NRGBA, out *image.RGBA, _ float64, coeffs []int16, of
 	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
 		row := in.Pix[x*in.Stride:]
 		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
-			var rgba [4]int32
+			var rA, gA, bA, aA int32
 			var sum int32
 			start := offset[y]
 			ci := y * filterLength
@@ -182,20 +182,20 @@ func resizeNRGBA(in *image.NRGBA, out *image.RGBA, _ float64, coeffs []int16, of
 					b := int32(row[xi+2]) * a
 					b /= 0xff
 
-					rgba[0] += int32(coeff) * r
-					rgba[1] += int32(coeff) * g
-					rgba[2] += int32(coeff) * b
-					rgba[3] += int32(coeff) * a
+					rA += int32(coeff) * r
+					gA += int32(coeff) * g
+					bA += int32(coeff) * b
+					aA += int32(coeff) * a
 					sum += int32(coeff)
 				}
 			}
 
 			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*4
 
-			out.Pix[xo+0] = clampUint8(rgba[0] / sum)
-			out.Pix[xo+1] = clampUint8(rgba[1] / sum)
-			out.Pix[xo+2] = clampUint8(rgba[2] / sum)
-			out.Pix[xo+3] = clampUint8(rgba[3] / sum)
+			out.Pix[xo+0] = clampUint8(rA / sum)
+			out.Pix[xo+1] = clampUint8(gA / sum)
+			out.Pix[xo+2] = clampUint8(bA / sum)
+			out.Pix[xo+3] = clampUint8(aA / sum)
 		}
 	}
 }
@@ -208,7 +208,7 @@ func resizeRGBA64(in *image.RGBA64, out *image.RGBA64, _ float64, coeffs []int32
 	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
 		row := in.Pix[x*in.Stride:]
 		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
-			var rgba [4]int64
+			var rA, gA, bA, aA int64
 			var sum int64
 			start := offset[y]
 			ci := y * filterLength
@@ -225,26 +225,26 @@ func resizeRGBA64(in *image.RGBA64, out *image.RGBA64, _ float64, coeffs []int32
 						xi = 0
 					}
 
-					rgba[0] += int64(coeff) * (int64(row[xi+0])<<8 | int64(row[xi+1]))
-					rgba[1] += int64(coeff) * (int64(row[xi+2])<<8 | int64(row[xi+3]))
-					rgba[2] += int64(coeff) * (int64(row[xi+4])<<8 | int64(row[xi+5]))
-					rgba[3] += int64(coeff) * (int64(row[xi+6])<<8 | int64(row[xi+7]))
+					rA += int64(coeff) * (int64(row[xi+0])<<8 | int64(row[xi+1]))
+					gA += int64(coeff) * (int64(row[xi+2])<<8 | int64(row[xi+3]))
+					bA += int64(coeff) * (int64(row[xi+4])<<8 | int64(row[xi+5]))
+					aA += int64(coeff) * (int64(row[xi+6])<<8 | int64(row[xi+7]))
 					sum += int64(coeff)
 				}
 			}
 
 			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*8
 
-			value := clampUint16(rgba[0] / sum)
+			value := clampUint16(rA / sum)
 			out.Pix[xo+0] = uint8(value >> 8)
 			out.Pix[xo+1] = uint8(value)
-			value = clampUint16(rgba[1] / sum)
+			value = clampUint16(gA / sum)
 			out.Pix[xo+2] = uint8(value >> 8)
 			out.Pix[xo+3] = uint8(value)
-			value = clampUint16(rgba[2] / sum)
+			value = clampUint16(bA / sum)
 			out.Pix[xo+4] = uint8(value >> 8)
 			out.Pix[xo+5] = uint8(value)
-			value = clampUint16(rgba[3] / sum)
+			value = clampUint16(aA / sum)
 			out.Pix[xo+6] = uint8(value >> 8)
 			out.Pix[xo+7] = uint8(value)
 		}
@@ -259,7 +259,7 @@ func resizeNRGBA64(in *image.NRGBA64, out *image.RGBA64, _ float64, coeffs []int
 	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
 		row := in.Pix[x*in.Stride:]
 		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
-			var rgba [4]int64
+			var rA, gA, bA, aA int64
 			var sum int64
 			start := offset[y]
 			ci := y * filterLength
@@ -285,26 +285,26 @@ func resizeNRGBA64(in *image.NRGBA64, out *image.RGBA64, _ float64, coeffs []int
 					b := int64(uint16(row[xi+4])<<8|uint16(row[xi+5])) * a
 					b /= 0xffff
 
-					rgba[0] += int64(coeff) * r
-					rgba[1] += int64(coeff) * g
-					rgba[2] += int64(coeff) * b
-					rgba[3] += int64(coeff) * a
+					rA += int64(coeff) * r
+					gA += int64(coeff) * g
+					bA += int64(coeff) * b
+					aA += int64(coeff) * a
 					sum += int64(coeff)
 				}
 			}
 
 			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*8
 
-			value := clampUint16(rgba[0] / sum)
+			value := clampUint16(rA / sum)
 			out.Pix[xo+0] = uint8(value >> 8)
 			out.Pix[xo+1] = uint8(value)
-			value = clampUint16(rgba[1] / sum)
+			value = clampUint16(gA / sum)
 			out.Pix[xo+2] = uint8(value >> 8)
 			out.Pix[xo+3] = uint8(value)
-			value = clampUint16(rgba[2] / sum)
+			value = clampUint16(bA / sum)
 			out.Pix[xo+4] = uint8(value >> 8)
 			out.Pix[xo+5] = uint8(value)
-			value = clampUint16(rgba[3] / sum)
+			value = clampUint16(aA / sum)
 			out.Pix[xo+6] = uint8(value >> 8)
 			out.Pix[xo+7] = uint8(value)
 		}
