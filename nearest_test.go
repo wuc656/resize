@@ -134,5 +134,3 @@ func TestNearestNRGBA64(t *testing.T) {
 		t.Errorf("nearestNRGBA64 failed to process color properly")
 	}
 }
-
-// Test edit to force diff
