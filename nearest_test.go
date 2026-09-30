@@ -16,7 +16,10 @@ THIS SOFTWARE.
 
 package resize
 
-import "testing"
+import (
+	"image"
+	"testing"
+)
 
 func Test_FloatToUint8(t *testing.T) {
 	var testData = []struct {
@@ -53,5 +56,64 @@ func Test_FloatToUint16(t *testing.T) {
 		if actual != test.expected {
 			t.Fail()
 		}
+	}
+}
+
+
+func TestNearestGeneric(t *testing.T) {
+	// A simple test for nearestGeneric to improve coverage
+	in := image.NewRGBA(image.Rect(0, 0, 2, 2))
+	out := image.NewRGBA64(image.Rect(0, 0, 2, 2))
+	coeffs := []bool{true, true}
+	offset := []int{0, 0}
+
+	nearestGeneric(in, out, 1.0, coeffs, offset, 1)
+
+	if out.Bounds().Dx() != 2 {
+		t.Errorf("nearestGeneric failed to process properly")
+	}
+}
+
+func TestNearestRGBA(t *testing.T) {
+	in := image.NewRGBA(image.Rect(0, 0, 2, 2))
+	out := image.NewRGBA(image.Rect(0, 0, 2, 2))
+	coeffs := []bool{true, true}
+	offset := []int{0, 0}
+	nearestRGBA(in, out, 1.0, coeffs, offset, 1)
+	if out.Bounds().Dx() != 2 {
+		t.Errorf("nearestRGBA failed")
+	}
+}
+
+func TestNearestNRGBA(t *testing.T) {
+	in := image.NewNRGBA(image.Rect(0, 0, 2, 2))
+	out := image.NewNRGBA(image.Rect(0, 0, 2, 2))
+	coeffs := []bool{true, true}
+	offset := []int{0, 0}
+	nearestNRGBA(in, out, 1.0, coeffs, offset, 1)
+	if out.Bounds().Dx() != 2 {
+		t.Errorf("nearestNRGBA failed")
+	}
+}
+
+func TestNearestRGBA64(t *testing.T) {
+	in := image.NewRGBA64(image.Rect(0, 0, 2, 2))
+	out := image.NewRGBA64(image.Rect(0, 0, 2, 2))
+	coeffs := []bool{true, true}
+	offset := []int{0, 0}
+	nearestRGBA64(in, out, 1.0, coeffs, offset, 1)
+	if out.Bounds().Dx() != 2 {
+		t.Errorf("nearestRGBA64 failed")
+	}
+}
+
+func TestNearestNRGBA64(t *testing.T) {
+	in := image.NewNRGBA64(image.Rect(0, 0, 2, 2))
+	out := image.NewNRGBA64(image.Rect(0, 0, 2, 2))
+	coeffs := []bool{true, true}
+	offset := []int{0, 0}
+	nearestNRGBA64(in, out, 1.0, coeffs, offset, 1)
+	if out.Bounds().Dx() != 2 {
+		t.Errorf("nearestNRGBA64 failed")
 	}
 }
