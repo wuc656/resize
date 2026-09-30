@@ -16,7 +16,11 @@ THIS SOFTWARE.
 
 package resize
 
-import "testing"
+import (
+	"image"
+	"image/color"
+	"testing"
+)
 
 func Test_FloatToUint8(t *testing.T) {
 	var testData = []struct {
@@ -53,5 +57,80 @@ func Test_FloatToUint16(t *testing.T) {
 		if actual != test.expected {
 			t.Fail()
 		}
+	}
+}
+
+func TestNearestGeneric(t *testing.T) {
+	in := image.NewRGBA(image.Rect(0, 0, 2, 2))
+	in.Set(0, 0, color.RGBA{255, 0, 0, 255})
+	out := image.NewRGBA64(image.Rect(0, 0, 2, 2))
+	coeffs := []bool{true, false, false, false}
+	offset := []int{0, 0}
+
+	nearestGeneric(in, out, 1.0, coeffs, offset, 2)
+
+	r, _, _, _ := out.At(0, 0).RGBA()
+	if r == 0 {
+		t.Errorf("nearestGeneric failed to process color properly")
+	}
+}
+
+func TestNearestRGBA(t *testing.T) {
+	in := image.NewRGBA(image.Rect(0, 0, 2, 2))
+	in.Set(0, 0, color.RGBA{255, 0, 0, 255})
+	out := image.NewRGBA(image.Rect(0, 0, 2, 2))
+	coeffs := []bool{true, false, false, false}
+	offset := []int{0, 0}
+
+	nearestRGBA(in, out, 1.0, coeffs, offset, 2)
+
+	r, _, _, _ := out.At(0, 0).RGBA()
+	if r == 0 {
+		t.Errorf("nearestRGBA failed to process color properly")
+	}
+}
+
+func TestNearestNRGBA(t *testing.T) {
+	in := image.NewNRGBA(image.Rect(0, 0, 2, 2))
+	in.Set(0, 0, color.NRGBA{255, 0, 0, 255})
+	out := image.NewNRGBA(image.Rect(0, 0, 2, 2))
+	coeffs := []bool{true, false, false, false}
+	offset := []int{0, 0}
+
+	nearestNRGBA(in, out, 1.0, coeffs, offset, 2)
+
+	r, _, _, _ := out.At(0, 0).RGBA()
+	if r == 0 {
+		t.Errorf("nearestNRGBA failed to process color properly")
+	}
+}
+
+func TestNearestRGBA64(t *testing.T) {
+	in := image.NewRGBA64(image.Rect(0, 0, 2, 2))
+	in.Set(0, 0, color.RGBA64{65535, 0, 0, 65535})
+	out := image.NewRGBA64(image.Rect(0, 0, 2, 2))
+	coeffs := []bool{true, false, false, false}
+	offset := []int{0, 0}
+
+	nearestRGBA64(in, out, 1.0, coeffs, offset, 2)
+
+	r, _, _, _ := out.At(0, 0).RGBA()
+	if r == 0 {
+		t.Errorf("nearestRGBA64 failed to process color properly")
+	}
+}
+
+func TestNearestNRGBA64(t *testing.T) {
+	in := image.NewNRGBA64(image.Rect(0, 0, 2, 2))
+	in.Set(0, 0, color.NRGBA64{65535, 0, 0, 65535})
+	out := image.NewNRGBA64(image.Rect(0, 0, 2, 2))
+	coeffs := []bool{true, false, false, false}
+	offset := []int{0, 0}
+
+	nearestNRGBA64(in, out, 1.0, coeffs, offset, 2)
+
+	r, _, _, _ := out.At(0, 0).RGBA()
+	if r == 0 {
+		t.Errorf("nearestNRGBA64 failed to process color properly")
 	}
 }
