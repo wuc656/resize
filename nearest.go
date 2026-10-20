@@ -103,19 +103,21 @@ func nearestRGBA(in *image.RGBA, out *image.RGBA, _ float64, coeffs []bool, offs
 					default:
 						xi = 0
 					}
-					rgba[0] += float32(row[xi+0])
-					rgba[1] += float32(row[xi+1])
-					rgba[2] += float32(row[xi+2])
-					rgba[3] += float32(row[xi+3])
+					p := row[xi : xi+4 : xi+4]
+					rgba[0] += float32(p[0])
+					rgba[1] += float32(p[1])
+					rgba[2] += float32(p[2])
+					rgba[3] += float32(p[3])
 					sum++
 				}
 			}
 
 			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*4
-			out.Pix[xo+0] = floatToUint8(rgba[0] / sum)
-			out.Pix[xo+1] = floatToUint8(rgba[1] / sum)
-			out.Pix[xo+2] = floatToUint8(rgba[2] / sum)
-			out.Pix[xo+3] = floatToUint8(rgba[3] / sum)
+			d := out.Pix[xo : xo+4 : xo+4]
+			d[0] = floatToUint8(rgba[0] / sum)
+			d[1] = floatToUint8(rgba[1] / sum)
+			d[2] = floatToUint8(rgba[2] / sum)
+			d[3] = floatToUint8(rgba[3] / sum)
 		}
 	}
 }
@@ -143,19 +145,21 @@ func nearestNRGBA(in *image.NRGBA, out *image.NRGBA, _ float64, coeffs []bool, o
 					default:
 						xi = 0
 					}
-					rgba[0] += float32(row[xi+0])
-					rgba[1] += float32(row[xi+1])
-					rgba[2] += float32(row[xi+2])
-					rgba[3] += float32(row[xi+3])
+					p := row[xi : xi+4 : xi+4]
+					rgba[0] += float32(p[0])
+					rgba[1] += float32(p[1])
+					rgba[2] += float32(p[2])
+					rgba[3] += float32(p[3])
 					sum++
 				}
 			}
 
 			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*4
-			out.Pix[xo+0] = floatToUint8(rgba[0] / sum)
-			out.Pix[xo+1] = floatToUint8(rgba[1] / sum)
-			out.Pix[xo+2] = floatToUint8(rgba[2] / sum)
-			out.Pix[xo+3] = floatToUint8(rgba[3] / sum)
+			d := out.Pix[xo : xo+4 : xo+4]
+			d[0] = floatToUint8(rgba[0] / sum)
+			d[1] = floatToUint8(rgba[1] / sum)
+			d[2] = floatToUint8(rgba[2] / sum)
+			d[3] = floatToUint8(rgba[3] / sum)
 		}
 	}
 }
@@ -183,27 +187,29 @@ func nearestRGBA64(in *image.RGBA64, out *image.RGBA64, _ float64, coeffs []bool
 					default:
 						xi = 0
 					}
-					rgba[0] += float32(uint16(row[xi+0])<<8 | uint16(row[xi+1]))
-					rgba[1] += float32(uint16(row[xi+2])<<8 | uint16(row[xi+3]))
-					rgba[2] += float32(uint16(row[xi+4])<<8 | uint16(row[xi+5]))
-					rgba[3] += float32(uint16(row[xi+6])<<8 | uint16(row[xi+7]))
+					p := row[xi : xi+8 : xi+8]
+					rgba[0] += float32(uint16(p[0])<<8 | uint16(p[1]))
+					rgba[1] += float32(uint16(p[2])<<8 | uint16(p[3]))
+					rgba[2] += float32(uint16(p[4])<<8 | uint16(p[5]))
+					rgba[3] += float32(uint16(p[6])<<8 | uint16(p[7]))
 					sum++
 				}
 			}
 
 			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*8
+			d := out.Pix[xo : xo+8 : xo+8]
 			value := floatToUint16(rgba[0] / sum)
-			out.Pix[xo+0] = uint8(value >> 8)
-			out.Pix[xo+1] = uint8(value)
+			d[0] = uint8(value >> 8)
+			d[1] = uint8(value)
 			value = floatToUint16(rgba[1] / sum)
-			out.Pix[xo+2] = uint8(value >> 8)
-			out.Pix[xo+3] = uint8(value)
+			d[2] = uint8(value >> 8)
+			d[3] = uint8(value)
 			value = floatToUint16(rgba[2] / sum)
-			out.Pix[xo+4] = uint8(value >> 8)
-			out.Pix[xo+5] = uint8(value)
+			d[4] = uint8(value >> 8)
+			d[5] = uint8(value)
 			value = floatToUint16(rgba[3] / sum)
-			out.Pix[xo+6] = uint8(value >> 8)
-			out.Pix[xo+7] = uint8(value)
+			d[6] = uint8(value >> 8)
+			d[7] = uint8(value)
 		}
 	}
 }
@@ -231,27 +237,29 @@ func nearestNRGBA64(in *image.NRGBA64, out *image.NRGBA64, _ float64, coeffs []b
 					default:
 						xi = 0
 					}
-					rgba[0] += float32(uint16(row[xi+0])<<8 | uint16(row[xi+1]))
-					rgba[1] += float32(uint16(row[xi+2])<<8 | uint16(row[xi+3]))
-					rgba[2] += float32(uint16(row[xi+4])<<8 | uint16(row[xi+5]))
-					rgba[3] += float32(uint16(row[xi+6])<<8 | uint16(row[xi+7]))
+					p := row[xi : xi+8 : xi+8]
+					rgba[0] += float32(uint16(p[0])<<8 | uint16(p[1]))
+					rgba[1] += float32(uint16(p[2])<<8 | uint16(p[3]))
+					rgba[2] += float32(uint16(p[4])<<8 | uint16(p[5]))
+					rgba[3] += float32(uint16(p[6])<<8 | uint16(p[7]))
 					sum++
 				}
 			}
 
 			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*8
+			d := out.Pix[xo : xo+8 : xo+8]
 			value := floatToUint16(rgba[0] / sum)
-			out.Pix[xo+0] = uint8(value >> 8)
-			out.Pix[xo+1] = uint8(value)
+			d[0] = uint8(value >> 8)
+			d[1] = uint8(value)
 			value = floatToUint16(rgba[1] / sum)
-			out.Pix[xo+2] = uint8(value >> 8)
-			out.Pix[xo+3] = uint8(value)
+			d[2] = uint8(value >> 8)
+			d[3] = uint8(value)
 			value = floatToUint16(rgba[2] / sum)
-			out.Pix[xo+4] = uint8(value >> 8)
-			out.Pix[xo+5] = uint8(value)
+			d[4] = uint8(value >> 8)
+			d[5] = uint8(value)
 			value = floatToUint16(rgba[3] / sum)
-			out.Pix[xo+6] = uint8(value >> 8)
-			out.Pix[xo+7] = uint8(value)
+			d[6] = uint8(value >> 8)
+			d[7] = uint8(value)
 		}
 	}
 }
@@ -311,15 +319,17 @@ func nearestGray16(in *image.Gray16, out *image.Gray16, _ float64, coeffs []bool
 					default:
 						xi = 0
 					}
-					gray += float32(uint16(row[xi+0])<<8 | uint16(row[xi+1]))
+					p := row[xi : xi+2 : xi+2]
+					gray += float32(uint16(p[0])<<8 | uint16(p[1]))
 					sum++
 				}
 			}
 
 			offset := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*2
+			d := out.Pix[offset : offset+2 : offset+2]
 			value := floatToUint16(gray / sum)
-			out.Pix[offset+0] = uint8(value >> 8)
-			out.Pix[offset+1] = uint8(value)
+			d[0] = uint8(value >> 8)
+			d[1] = uint8(value)
 		}
 	}
 }

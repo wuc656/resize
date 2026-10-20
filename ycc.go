@@ -88,33 +88,22 @@ func newYCC(r image.Rectangle, s image.YCbCrSubsampleRatio) *ycc {
 	return &ycc{Pix: buf, Stride: 3 * w, Rect: r, SubsampleRatio: s}
 }
 
-// Copy of image.YCbCrSubsampleRatio constants - this allows us to support
-// older versions of Go where these constants are not defined (i.e. Go 1.4)
-const (
-	ycbcrSubsampleRatio444 image.YCbCrSubsampleRatio = iota
-	ycbcrSubsampleRatio422
-	ycbcrSubsampleRatio420
-	ycbcrSubsampleRatio440
-	ycbcrSubsampleRatio411
-	ycbcrSubsampleRatio410
-)
-
 // YCbCr converts ycc to a YCbCr image with the same subsample ratio
 // as the YCbCr image that ycc was generated from.
 func (p *ycc) YCbCr() *image.YCbCr {
 	ycbcr := image.NewYCbCr(p.Rect, p.SubsampleRatio)
 	switch ycbcr.SubsampleRatio {
-	case ycbcrSubsampleRatio422:
+	case image.YCbCrSubsampleRatio422:
 		return p.ycbcr422(ycbcr)
-	case ycbcrSubsampleRatio420:
+	case image.YCbCrSubsampleRatio420:
 		return p.ycbcr420(ycbcr)
-	case ycbcrSubsampleRatio440:
+	case image.YCbCrSubsampleRatio440:
 		return p.ycbcr440(ycbcr)
-	case ycbcrSubsampleRatio444:
+	case image.YCbCrSubsampleRatio444:
 		return p.ycbcr444(ycbcr)
-	case ycbcrSubsampleRatio411:
+	case image.YCbCrSubsampleRatio411:
 		return p.ycbcr411(ycbcr)
-	case ycbcrSubsampleRatio410:
+	case image.YCbCrSubsampleRatio410:
 		return p.ycbcr410(ycbcr)
 	}
 	return ycbcr
@@ -130,17 +119,17 @@ func imageYCbCrToYCC(in *image.YCbCr) *ycc {
 		SubsampleRatio: in.SubsampleRatio,
 	}
 	switch in.SubsampleRatio {
-	case ycbcrSubsampleRatio422:
+	case image.YCbCrSubsampleRatio422:
 		return convertToYCC422(in, &p)
-	case ycbcrSubsampleRatio420:
+	case image.YCbCrSubsampleRatio420:
 		return convertToYCC420(in, &p)
-	case ycbcrSubsampleRatio440:
+	case image.YCbCrSubsampleRatio440:
 		return convertToYCC440(in, &p)
-	case ycbcrSubsampleRatio444:
+	case image.YCbCrSubsampleRatio444:
 		return convertToYCC444(in, &p)
-	case ycbcrSubsampleRatio411:
+	case image.YCbCrSubsampleRatio411:
 		return convertToYCC411(in, &p)
-	case ycbcrSubsampleRatio410:
+	case image.YCbCrSubsampleRatio410:
 		return convertToYCC410(in, &p)
 	}
 	return &p

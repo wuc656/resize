@@ -2,13 +2,8 @@ package resize
 
 import (
 	"image"
-	"runtime"
 	"testing"
 )
-
-func init() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-}
 
 var thumbnailTests = []struct {
 	origWidth      int
@@ -25,6 +20,10 @@ var thumbnailTests = []struct {
 	{50, 100, 60, 90, 45, 90},
 	{120, 100, 60, 90, 60, 50},
 	{200, 250, 200, 150, 120, 150},
+	{0, 10, 5, 5, 0, 10},
+	{10, 0, 5, 5, 10, 0},
+	{10, 10, 0, 5, 10, 10},
+	{10, 10, 5, 0, 10, 10},
 }
 
 func TestThumbnail(t *testing.T) {

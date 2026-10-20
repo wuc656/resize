@@ -1,6 +1,3 @@
-//go:build go1.5
-// +build go1.5
-
 /*
 Copyright (c) 2014, Charlie Vieth <charlie.vieth@gmail.com>
 

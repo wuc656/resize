@@ -26,11 +26,15 @@ import (
 // are already smaller than provided constraints.
 func Thumbnail(maxWidth, maxHeight uint, img image.Image, interp InterpolationFunction) image.Image {
 	origBounds := img.Bounds()
+	if origBounds.Dx() <= 0 || origBounds.Dy() <= 0 || maxWidth == 0 || maxHeight == 0 {
+		return img
+	}
+
 	origWidth := uint(origBounds.Dx())
 	origHeight := uint(origBounds.Dy())
 	newWidth, newHeight := origWidth, origHeight
 
-	// Return original image if it have same or smaller size as constraints
+	// Return original image if it has same or smaller size as constraints
 	if maxWidth >= origWidth && maxHeight >= origHeight {
 		return img
 	}

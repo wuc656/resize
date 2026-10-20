@@ -3,14 +3,12 @@ package resize
 import (
 	"image"
 	"image/color"
-	"runtime"
 	"testing"
 )
 
 var img = image.NewGray16(image.Rect(0, 0, 3, 3))
 
 func init() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
 	img.Set(1, 1, color.White)
 }
 
