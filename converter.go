@@ -321,7 +321,7 @@ func resizeGray(in *image.Gray, out *image.Gray, _ float64, coeffs []int16, offs
 	maxX := in.Bounds().Dx() - 1
 
 	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
-		row := in.Pix[(x-newBounds.Min.X)*in.Stride:]
+		row := in.Pix[x*in.Stride:]
 		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
 			var gray int32
 			var sum int32

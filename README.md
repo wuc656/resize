@@ -1,11 +1,10 @@
-# This package is no longer being updated! Please look for alternatives if that bothers you.
-
 Resize
 ======
 
-Image resizing for the [Go programming language](http://golang.org) with common interpolation methods.
+Image resizing for the [Go programming language](https://go.dev) with common interpolation methods.
 
-[![Build Status](https://travis-ci.org/nfnt/resize.svg)](https://travis-ci.org/nfnt/resize)
+[![Go CI](https://github.com/wuc656/resize/actions/workflows/go.yml/badge.svg)](https://github.com/wuc656/resize/actions/workflows/go.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/wuc656/resize.svg)](https://pkg.go.dev/github.com/wuc656/resize)
 
 Installation
 ------------
@@ -19,7 +18,7 @@ It's that easy!
 Usage
 -----
 
-This package needs at least Go 1.1. Import package with
+Import package with
 
 ```go
 import "github.com/wuc656/resize"

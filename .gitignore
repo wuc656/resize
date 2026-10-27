@@ -1,0 +1,21 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test artifacts & coverage
+*.test
+*.out
+coverage.txt
+
+# Tooling
+.codegraph/
+.projectmem/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
