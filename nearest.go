@@ -18,318 +18,256 @@ package resize
 
 import "image"
 
-func floatToUint8(x float32) uint8 {
-	// Nearest-neighbor values are always
-	// positive no need to check lower-bound.
-	if x > maxUint8-1 {
-		return maxUint8
-	}
-	return uint8(x)
-}
-
-func floatToUint16(x float32) uint16 {
-	if x > maxUint16-1 {
-		return maxUint16
-	}
-	return uint16(x)
-}
-
-// func nearestGeneric(in image.Image, out *image.RGBA64, scale float64, coeffs []bool, offset []int, filterLength int) {
-func nearestGeneric(in image.Image, out *image.RGBA64, _ float64, coeffs []bool, offset []int, filterLength int) {
+func nearestGeneric(in image.Image, out *image.RGBA64, starts, counts []int) {
 	newBounds := out.Bounds()
-	maxX := in.Bounds().Dx() - 1
+	inMinX, inMinY := in.Bounds().Min.X, in.Bounds().Min.Y
 
 	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
 		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
-			var rgba [4]float32
-			var sum float32
-			start := offset[y]
-			ci := y * filterLength
-			for i := range filterLength {
-				if coeffs[ci+i] {
-					xi := start + i
-					switch {
-					case xi < 0:
-						xi = 0
-					case xi >= maxX:
-						xi = maxX
-					}
-					r, g, b, a := in.At(xi+in.Bounds().Min.X, x+in.Bounds().Min.Y).RGBA()
-					rgba[0] += float32(r)
-					rgba[1] += float32(g)
-					rgba[2] += float32(b)
-					rgba[3] += float32(a)
-					sum++
-				}
-			}
-
-			offset := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*8
-			value := floatToUint16(rgba[0] / sum)
-			out.Pix[offset+0] = uint8(value >> 8)
-			out.Pix[offset+1] = uint8(value)
-			value = floatToUint16(rgba[1] / sum)
-			out.Pix[offset+2] = uint8(value >> 8)
-			out.Pix[offset+3] = uint8(value)
-			value = floatToUint16(rgba[2] / sum)
-			out.Pix[offset+4] = uint8(value >> 8)
-			out.Pix[offset+5] = uint8(value)
-			value = floatToUint16(rgba[3] / sum)
-			out.Pix[offset+6] = uint8(value >> 8)
-			out.Pix[offset+7] = uint8(value)
-		}
-	}
-}
-
-// func nearestRGBA(in *image.RGBA, out *image.RGBA, scale float64, coeffs []bool, offset []int, filterLength int) {
-func nearestRGBA(in *image.RGBA, out *image.RGBA, _ float64, coeffs []bool, offset []int, filterLength int) {
-	newBounds := out.Bounds()
-	maxX := in.Bounds().Dx() - 1
-
-	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
-		row := in.Pix[x*in.Stride:]
-		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
-			var rgba [4]float32
-			var sum float32
-			start := offset[y]
-			ci := y * filterLength
-			for i := range filterLength {
-				if coeffs[ci+i] {
-					xi := start + i
-					switch {
-					case uint(xi) < uint(maxX):
-						xi *= 4
-					case xi >= maxX:
-						xi = 4 * maxX
-					default:
-						xi = 0
-					}
-					p := row[xi : xi+4 : xi+4]
-					rgba[0] += float32(p[0])
-					rgba[1] += float32(p[1])
-					rgba[2] += float32(p[2])
-					rgba[3] += float32(p[3])
-					sum++
-				}
-			}
-
-			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*4
-			d := out.Pix[xo : xo+4 : xo+4]
-			d[0] = floatToUint8(rgba[0] / sum)
-			d[1] = floatToUint8(rgba[1] / sum)
-			d[2] = floatToUint8(rgba[2] / sum)
-			d[3] = floatToUint8(rgba[3] / sum)
-		}
-	}
-}
-
-// func nearestNRGBA(in *image.NRGBA, out *image.NRGBA, scale float64, coeffs []bool, offset []int, filterLength int) {
-func nearestNRGBA(in *image.NRGBA, out *image.NRGBA, _ float64, coeffs []bool, offset []int, filterLength int) {
-	newBounds := out.Bounds()
-	maxX := in.Bounds().Dx() - 1
-
-	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
-		row := in.Pix[x*in.Stride:]
-		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
-			var rgba [4]float32
-			var sum float32
-			start := offset[y]
-			ci := y * filterLength
-			for i := range filterLength {
-				if coeffs[ci+i] {
-					xi := start + i
-					switch {
-					case uint(xi) < uint(maxX):
-						xi *= 4
-					case xi >= maxX:
-						xi = 4 * maxX
-					default:
-						xi = 0
-					}
-					p := row[xi : xi+4 : xi+4]
-					rgba[0] += float32(p[0])
-					rgba[1] += float32(p[1])
-					rgba[2] += float32(p[2])
-					rgba[3] += float32(p[3])
-					sum++
-				}
-			}
-
-			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*4
-			d := out.Pix[xo : xo+4 : xo+4]
-			d[0] = floatToUint8(rgba[0] / sum)
-			d[1] = floatToUint8(rgba[1] / sum)
-			d[2] = floatToUint8(rgba[2] / sum)
-			d[3] = floatToUint8(rgba[3] / sum)
-		}
-	}
-}
-
-// func nearestRGBA64(in *image.RGBA64, out *image.RGBA64, scale float64, coeffs []bool, offset []int, filterLength int) {
-func nearestRGBA64(in *image.RGBA64, out *image.RGBA64, _ float64, coeffs []bool, offset []int, filterLength int) {
-	newBounds := out.Bounds()
-	maxX := in.Bounds().Dx() - 1
-
-	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
-		row := in.Pix[x*in.Stride:]
-		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
-			var rgba [4]float32
-			var sum float32
-			start := offset[y]
-			ci := y * filterLength
-			for i := range filterLength {
-				if coeffs[ci+i] {
-					xi := start + i
-					switch {
-					case uint(xi) < uint(maxX):
-						xi *= 8
-					case xi >= maxX:
-						xi = 8 * maxX
-					default:
-						xi = 0
-					}
-					p := row[xi : xi+8 : xi+8]
-					rgba[0] += float32(uint16(p[0])<<8 | uint16(p[1]))
-					rgba[1] += float32(uint16(p[2])<<8 | uint16(p[3]))
-					rgba[2] += float32(uint16(p[4])<<8 | uint16(p[5]))
-					rgba[3] += float32(uint16(p[6])<<8 | uint16(p[7]))
-					sum++
-				}
+			start := starts[y]
+			count := counts[y]
+			var rA, gA, bA, aA uint64
+			for i := range count {
+				r, g, b, a := in.At(start+i+inMinX, x+inMinY).RGBA()
+				rA += uint64(r)
+				gA += uint64(g)
+				bA += uint64(b)
+				aA += uint64(a)
 			}
 
 			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*8
 			d := out.Pix[xo : xo+8 : xo+8]
-			value := floatToUint16(rgba[0] / sum)
-			d[0] = uint8(value >> 8)
-			d[1] = uint8(value)
-			value = floatToUint16(rgba[1] / sum)
-			d[2] = uint8(value >> 8)
-			d[3] = uint8(value)
-			value = floatToUint16(rgba[2] / sum)
-			d[4] = uint8(value >> 8)
-			d[5] = uint8(value)
-			value = floatToUint16(rgba[3] / sum)
-			d[6] = uint8(value >> 8)
-			d[7] = uint8(value)
+			c := uint64(count)
+			v := uint16(rA / c)
+			d[0] = uint8(v >> 8)
+			d[1] = uint8(v)
+			v = uint16(gA / c)
+			d[2] = uint8(v >> 8)
+			d[3] = uint8(v)
+			v = uint16(bA / c)
+			d[4] = uint8(v >> 8)
+			d[5] = uint8(v)
+			v = uint16(aA / c)
+			d[6] = uint8(v >> 8)
+			d[7] = uint8(v)
 		}
 	}
 }
 
-// func nearestNRGBA64(in *image.NRGBA64, out *image.NRGBA64, scale float64, coeffs []bool, offset []int, filterLength int) {
-func nearestNRGBA64(in *image.NRGBA64, out *image.NRGBA64, _ float64, coeffs []bool, offset []int, filterLength int) {
+func nearestRGBA(in *image.RGBA, out *image.RGBA, starts, counts []int) {
 	newBounds := out.Bounds()
-	maxX := in.Bounds().Dx() - 1
 
 	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
 		row := in.Pix[x*in.Stride:]
 		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
-			var rgba [4]float32
-			var sum float32
-			start := offset[y]
-			ci := y * filterLength
-			for i := range filterLength {
-				if coeffs[ci+i] {
-					xi := start + i
-					switch {
-					case uint(xi) < uint(maxX):
-						xi *= 8
-					case xi >= maxX:
-						xi = 8 * maxX
-					default:
-						xi = 0
-					}
-					p := row[xi : xi+8 : xi+8]
-					rgba[0] += float32(uint16(p[0])<<8 | uint16(p[1]))
-					rgba[1] += float32(uint16(p[2])<<8 | uint16(p[3]))
-					rgba[2] += float32(uint16(p[4])<<8 | uint16(p[5]))
-					rgba[3] += float32(uint16(p[6])<<8 | uint16(p[7]))
-					sum++
-				}
+			xi := starts[y] * 4
+			count := counts[y]
+			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*4
+			d := out.Pix[xo : xo+4 : xo+4]
+
+			if count == 1 {
+				p := row[xi : xi+4 : xi+4]
+				d[0] = p[0]
+				d[1] = p[1]
+				d[2] = p[2]
+				d[3] = p[3]
+				continue
 			}
 
+			var rA, gA, bA, aA uint32
+			for range count {
+				p := row[xi : xi+4 : xi+4]
+				rA += uint32(p[0])
+				gA += uint32(p[1])
+				bA += uint32(p[2])
+				aA += uint32(p[3])
+				xi += 4
+			}
+			c := uint32(count)
+			d[0] = uint8(rA / c)
+			d[1] = uint8(gA / c)
+			d[2] = uint8(bA / c)
+			d[3] = uint8(aA / c)
+		}
+	}
+}
+
+func nearestNRGBA(in *image.NRGBA, out *image.NRGBA, starts, counts []int) {
+	newBounds := out.Bounds()
+
+	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
+		row := in.Pix[x*in.Stride:]
+		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
+			xi := starts[y] * 4
+			count := counts[y]
+			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*4
+			d := out.Pix[xo : xo+4 : xo+4]
+
+			if count == 1 {
+				p := row[xi : xi+4 : xi+4]
+				d[0] = p[0]
+				d[1] = p[1]
+				d[2] = p[2]
+				d[3] = p[3]
+				continue
+			}
+
+			var rA, gA, bA, aA uint32
+			for range count {
+				p := row[xi : xi+4 : xi+4]
+				rA += uint32(p[0])
+				gA += uint32(p[1])
+				bA += uint32(p[2])
+				aA += uint32(p[3])
+				xi += 4
+			}
+			c := uint32(count)
+			d[0] = uint8(rA / c)
+			d[1] = uint8(gA / c)
+			d[2] = uint8(bA / c)
+			d[3] = uint8(aA / c)
+		}
+	}
+}
+
+func nearestRGBA64(in *image.RGBA64, out *image.RGBA64, starts, counts []int) {
+	newBounds := out.Bounds()
+
+	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
+		row := in.Pix[x*in.Stride:]
+		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
+			xi := starts[y] * 8
+			count := counts[y]
 			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*8
 			d := out.Pix[xo : xo+8 : xo+8]
-			value := floatToUint16(rgba[0] / sum)
-			d[0] = uint8(value >> 8)
-			d[1] = uint8(value)
-			value = floatToUint16(rgba[1] / sum)
-			d[2] = uint8(value >> 8)
-			d[3] = uint8(value)
-			value = floatToUint16(rgba[2] / sum)
-			d[4] = uint8(value >> 8)
-			d[5] = uint8(value)
-			value = floatToUint16(rgba[3] / sum)
-			d[6] = uint8(value >> 8)
-			d[7] = uint8(value)
+
+			if count == 1 {
+				p := row[xi : xi+8 : xi+8]
+				copy(d, p)
+				continue
+			}
+
+			var rA, gA, bA, aA uint64
+			for range count {
+				p := row[xi : xi+8 : xi+8]
+				rA += uint64(uint16(p[0])<<8 | uint16(p[1]))
+				gA += uint64(uint16(p[2])<<8 | uint16(p[3]))
+				bA += uint64(uint16(p[4])<<8 | uint16(p[5]))
+				aA += uint64(uint16(p[6])<<8 | uint16(p[7]))
+				xi += 8
+			}
+			c := uint64(count)
+			v := uint16(rA / c)
+			d[0] = uint8(v >> 8)
+			d[1] = uint8(v)
+			v = uint16(gA / c)
+			d[2] = uint8(v >> 8)
+			d[3] = uint8(v)
+			v = uint16(bA / c)
+			d[4] = uint8(v >> 8)
+			d[5] = uint8(v)
+			v = uint16(aA / c)
+			d[6] = uint8(v >> 8)
+			d[7] = uint8(v)
 		}
 	}
 }
 
-// func nearestGray(in *image.Gray, out *image.Gray, scale float64, coeffs []bool, offset []int, filterLength int) {
-func nearestGray(in *image.Gray, out *image.Gray, _ float64, coeffs []bool, offset []int, filterLength int) {
+func nearestNRGBA64(in *image.NRGBA64, out *image.NRGBA64, starts, counts []int) {
 	newBounds := out.Bounds()
-	maxX := in.Bounds().Dx() - 1
 
 	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
 		row := in.Pix[x*in.Stride:]
 		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
-			var gray float32
-			var sum float32
-			start := offset[y]
-			ci := y * filterLength
-			for i := range filterLength {
-				if coeffs[ci+i] {
-					xi := start + i
-					switch {
-					case xi < 0:
-						xi = 0
-					case xi >= maxX:
-						xi = maxX
-					}
-					gray += float32(row[xi])
-					sum++
-				}
+			xi := starts[y] * 8
+			count := counts[y]
+			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*8
+			d := out.Pix[xo : xo+8 : xo+8]
+
+			if count == 1 {
+				p := row[xi : xi+8 : xi+8]
+				copy(d, p)
+				continue
 			}
 
-			offset := (y-newBounds.Min.Y)*out.Stride + (x - newBounds.Min.X)
-			out.Pix[offset] = floatToUint8(gray / sum)
+			var rA, gA, bA, aA uint64
+			for range count {
+				p := row[xi : xi+8 : xi+8]
+				rA += uint64(uint16(p[0])<<8 | uint16(p[1]))
+				gA += uint64(uint16(p[2])<<8 | uint16(p[3]))
+				bA += uint64(uint16(p[4])<<8 | uint16(p[5]))
+				aA += uint64(uint16(p[6])<<8 | uint16(p[7]))
+				xi += 8
+			}
+			c := uint64(count)
+			v := uint16(rA / c)
+			d[0] = uint8(v >> 8)
+			d[1] = uint8(v)
+			v = uint16(gA / c)
+			d[2] = uint8(v >> 8)
+			d[3] = uint8(v)
+			v = uint16(bA / c)
+			d[4] = uint8(v >> 8)
+			d[5] = uint8(v)
+			v = uint16(aA / c)
+			d[6] = uint8(v >> 8)
+			d[7] = uint8(v)
 		}
 	}
 }
 
-// func nearestGray16(in *image.Gray16, out *image.Gray16, scale float64, coeffs []bool, offset []int, filterLength int) {
-func nearestGray16(in *image.Gray16, out *image.Gray16, _ float64, coeffs []bool, offset []int, filterLength int) {
+func nearestGray(in *image.Gray, out *image.Gray, starts, counts []int) {
 	newBounds := out.Bounds()
-	maxX := in.Bounds().Dx() - 1
 
 	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
 		row := in.Pix[x*in.Stride:]
 		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
-			var gray float32
-			var sum float32
-			start := offset[y]
-			ci := y * filterLength
-			for i := range filterLength {
-				if coeffs[ci+i] {
-					xi := start + i
-					switch {
-					case uint(xi) < uint(maxX):
-						xi *= 2
-					case xi >= maxX:
-						xi = 2 * maxX
-					default:
-						xi = 0
-					}
-					p := row[xi : xi+2 : xi+2]
-					gray += float32(uint16(p[0])<<8 | uint16(p[1]))
-					sum++
-				}
+			xi := starts[y]
+			count := counts[y]
+			xo := (y-newBounds.Min.Y)*out.Stride + (x - newBounds.Min.X)
+
+			if count == 1 {
+				out.Pix[xo] = row[xi]
+				continue
 			}
 
-			offset := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*2
-			d := out.Pix[offset : offset+2 : offset+2]
-			value := floatToUint16(gray / sum)
-			d[0] = uint8(value >> 8)
-			d[1] = uint8(value)
+			var gray uint32
+			for range count {
+				gray += uint32(row[xi])
+				xi++
+			}
+			out.Pix[xo] = uint8(gray / uint32(count))
+		}
+	}
+}
+
+func nearestGray16(in *image.Gray16, out *image.Gray16, starts, counts []int) {
+	newBounds := out.Bounds()
+
+	for x := newBounds.Min.X; x < newBounds.Max.X; x++ {
+		row := in.Pix[x*in.Stride:]
+		for y := newBounds.Min.Y; y < newBounds.Max.Y; y++ {
+			xi := starts[y] * 2
+			count := counts[y]
+			xo := (y-newBounds.Min.Y)*out.Stride + (x-newBounds.Min.X)*2
+			d := out.Pix[xo : xo+2 : xo+2]
+
+			if count == 1 {
+				p := row[xi : xi+2 : xi+2]
+				d[0] = p[0]
+				d[1] = p[1]
+				continue
+			}
+
+			var gray uint64
+			for range count {
+				p := row[xi : xi+2 : xi+2]
+				gray += uint64(uint16(p[0])<<8 | uint16(p[1]))
+				xi += 2
+			}
+			v := uint16(gray / uint64(count))
+			d[0] = uint8(v >> 8)
+			d[1] = uint8(v)
 		}
 	}
 }

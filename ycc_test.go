@@ -215,3 +215,37 @@ func testYCbCr(t *testing.T, r image.Rectangle, subsampleRatio image.YCbCrSubsam
 		}
 	}
 }
+
+func TestConvertYCbCrSubImageOddOrigin(t *testing.T) {
+	ratios := []image.YCbCrSubsampleRatio{
+		image.YCbCrSubsampleRatio444,
+		image.YCbCrSubsampleRatio422,
+		image.YCbCrSubsampleRatio420,
+		image.YCbCrSubsampleRatio440,
+		image.YCbCrSubsampleRatio411,
+		image.YCbCrSubsampleRatio410,
+	}
+	for _, ratio := range ratios {
+		parent := image.NewYCbCr(image.Rect(0, 0, 32, 32), ratio)
+		for y := parent.Rect.Min.Y; y < parent.Rect.Max.Y; y++ {
+			for x := parent.Rect.Min.X; x < parent.Rect.Max.X; x++ {
+				yi := parent.YOffset(x, y)
+				ci := parent.COffset(x, y)
+				parent.Y[yi] = uint8(17*y + 3*x)
+				parent.Cb[ci] = uint8(5*y + 11*x)
+				parent.Cr[ci] = uint8(13*y + 7*x)
+			}
+		}
+		sub := parent.SubImage(image.Rect(3, 5, 25, 27)).(*image.YCbCr)
+		yc := imageYCbCrToYCC(sub)
+		for y := sub.Rect.Min.Y; y < sub.Rect.Max.Y; y++ {
+			for x := sub.Rect.Min.X; x < sub.Rect.Max.X; x++ {
+				want := sub.YCbCrAt(x, y)
+				got := yc.At(x-sub.Rect.Min.X, y-sub.Rect.Min.Y).(color.YCbCr)
+				if want != got {
+					t.Fatalf("ratio=%v x=%d y=%d: got %v, want %v", ratio, x, y, got, want)
+				}
+			}
+		}
+	}
+}
